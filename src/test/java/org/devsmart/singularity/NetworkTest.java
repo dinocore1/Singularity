@@ -8,10 +8,11 @@ import net.jxta.document.Document;
 import net.jxta.document.MimeMediaType;
 import net.jxta.id.IDFactory;
 import net.jxta.peergroup.PeerGroup;
+import net.jxta.platform.ModuleClassID;
 import net.jxta.platform.NetworkManager;
-import net.jxta.protocol.ModuleClassAdvertisement;
-import net.jxta.protocol.ResolverSrdiMsg;
+import net.jxta.protocol.*;
 import net.jxta.resolver.ResolverService;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -66,6 +67,11 @@ public class NetworkTest {
         mInjector = Guice.createInjector(new TestModule());
     }
 
+    @Before
+    public void inject(){
+        mInjector.injectMembers(this);
+    }
+
     @Inject @Named("dir.p2p")
     File p2pdir;
 
@@ -77,12 +83,33 @@ public class NetworkTest {
 
         manager.startNetwork();
 
-        PeerGroup peergroup = manager.getNetPeerGroup();
-
-
+        PeerGroup netpeergroup = manager.getNetPeerGroup();
+        DiscoveryService discovery = netpeergroup.getDiscoveryService();
 
         ModuleClassAdvertisement mcadv = (ModuleClassAdvertisement) AdvertisementFactory.newAdvertisement(ModuleClassAdvertisement.getAdvertisementType());
-        IDFactory.newModuleClassID("");
+        mcadv.setName("devsmart:test");
+        mcadv.setDescription("this is a test");
+        ModuleClassID mcID = IDFactory.newModuleClassID();
+        mcadv.setModuleClassID(mcID);
+
+        discovery.publish(mcadv);
+        discovery.remotePublish(mcadv);
+
+
+        ModuleSpecAdvertisement moduleSpecAdvertisement = (ModuleSpecAdvertisement)AdvertisementFactory.newAdvertisement(ModuleSpecAdvertisement.getAdvertisementType());
+        moduleSpecAdvertisement.setName("devsmart:test");
+        moduleSpecAdvertisement.setVersion("Version 1.0");
+        moduleSpecAdvertisement.setModuleSpecID(IDFactory.newModuleSpecID(mcID));
+
+        /*
+        PeerGroupAdvertisement peerGroupAdv = (PeerGroupAdvertisement)AdvertisementFactory.newAdvertisement(PeerGroupAdvertisement.getAdvertisementType());
+        peerGroupAdv.setPeerGroupID(IDFactory.newPeerGroupID());
+        peerGroupAdv.setName("Singularity");
+        peerGroupAdv.setDescription("This is a test");
+        peerGroupAdv.setModuleSpecID(IDFactory.newModuleSpecID());
+        netpeergroup.newGroup(peerGroupAdv);
+        */
+
 
 
 

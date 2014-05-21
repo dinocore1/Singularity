@@ -12,5 +12,6 @@ dependencies {
     compile 'org.neo4j:neo4j:2.0.3'
 	compile 'com.kenai.jxse:jxse:2.7'
     compile 'com.google.inject:guice:3.0'
+    compile 'org.jboss.netty:netty:3.2.10.Final'
     testCompile 'junit:junit:4.11'
 }
